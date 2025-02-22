@@ -1,6 +1,7 @@
 package com.example.tariffParser.service;
 
 import com.example.tariffParser.model.Tariff;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -13,10 +14,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
 @Service
 public class PageParserImpl implements PageParser {
 
-    private final String url = "https://moscow.megafon.ru/tariffs/all/";
+    private final String BASE_URL = "https://moscow.megafon.ru/";
+    private final String URL = "https://moscow.megafon.ru/tariffs/all/";
 
     private final Pattern patternForGb = Pattern.compile("(\\d+) ГБ");
     private final Pattern patternForMin = Pattern.compile("(\\d+) Минут");
@@ -24,7 +27,8 @@ public class PageParserImpl implements PageParser {
     @Override
     public List<Tariff> getTariffs() {
         try {
-            Document document = Jsoup.connect(url).get();
+            log.debug("Запрашивание тарифов с сайта");
+            Document document = Jsoup.connect(URL).get();
             Elements tariffsBlocks = document.select(".tariffs-carousel-v4__card-wrapper");
             List<Tariff> tariffs = new ArrayList<>();
 
@@ -35,6 +39,7 @@ public class PageParserImpl implements PageParser {
             return tariffs;
 
         } catch (IOException e) {
+            log.warn("Ошибка при парсинге тарифов");
             throw new RuntimeException("Не удалось получить тарифы");
         }
     }
@@ -43,7 +48,7 @@ public class PageParserImpl implements PageParser {
         String name = tariffBlock.select("a.tariffs-card-header-v4__title-link").text();
         String price = tariffBlock.select("div.tariffs-card-buy-v4__price").text();
         String description = tariffBlock.select(".tariffs-card-v4__body>div:not(.tariffs-card-v4__buy)").text();
-        String url = tariffBlock.select("a.tariffs-card-header-v4__title-link").attr("href");
+        String url = BASE_URL + tariffBlock.select("a.tariffs-card-header-v4__title-link").attr("href");
         int gbCount = getGbFromDescription(description);
         int minutesCount = getMinFromDescription(description);
 
