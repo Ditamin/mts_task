@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -18,7 +19,7 @@ public class TariffService {
     @Autowired
     private final TariffRepository tariffRepository;
 
-    public List<Tariff> getTariffs() {
+    public List<Tariff> getTariffs() throws IOException {
         List<Tariff> tariffs = parser.getTariffs();
 
         log.debug("Сохранение полученных тарифов");

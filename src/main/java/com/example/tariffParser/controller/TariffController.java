@@ -5,10 +5,10 @@ import com.example.tariffParser.service.TariffService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -19,7 +19,7 @@ public class TariffController {
     private final TariffService tariffService;
 
     @GetMapping(value = "tariffs")
-    List<Tariff> getTariff() {
+    List<Tariff> getTariff() throws IOException {
         log.info("Запрос на получение тарифов");
         return tariffService.getTariffs();
     }

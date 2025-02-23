@@ -32,4 +32,17 @@ public class Tariff {
         this.gbCount = gbCount;
         this.url = url;
     }
+
+    @Override
+    public String toString() {
+        return "Tariff{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", price='" + price + '\'' +
+                ", minutesCount=" + minutesCount +
+                ", gbCount=" + gbCount +
+                ", url='" + url + '\'' +
+                '}';
+    }
 }
