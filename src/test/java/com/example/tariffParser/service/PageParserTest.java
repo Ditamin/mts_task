@@ -1,6 +1,7 @@
 package com.example.tariffParser.service;
 
 import com.example.tariffParser.model.Tariff;
+import com.example.tariffParser.service.parser.JsoupPageParser;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.assertj.core.api.Assertions;
@@ -11,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 
-class PageParserImplTest {
+class PageParserTest {
     public static MockWebServer serviceMock;
 
     @BeforeAll
@@ -61,7 +62,7 @@ class PageParserImplTest {
     }
 
     @Test
-    void getTariffsFailedToFetchDataTest() throws IOException {
+    void getTariffsFailedToFetchDataTest() {
         String baseUrl = String.format("http://localhost:%s", serviceMock.getPort());
         var parser = new JsoupPageParser(baseUrl);
 

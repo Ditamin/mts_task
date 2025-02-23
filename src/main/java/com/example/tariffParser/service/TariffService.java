@@ -2,6 +2,7 @@ package com.example.tariffParser.service;
 
 import com.example.tariffParser.model.Tariff;
 import com.example.tariffParser.repository.TariffRepository;
+import com.example.tariffParser.service.parser.PageParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

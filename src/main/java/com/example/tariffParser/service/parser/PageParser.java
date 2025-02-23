@@ -1,4 +1,4 @@
-package com.example.tariffParser.service;
+package com.example.tariffParser.service.parser;
 
 import com.example.tariffParser.model.Tariff;
 

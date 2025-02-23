@@ -2,6 +2,7 @@ package com.example.tariffParser.service;
 
 import com.example.tariffParser.model.Tariff;
 import com.example.tariffParser.repository.TariffRepository;
+import com.example.tariffParser.service.parser.PageParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

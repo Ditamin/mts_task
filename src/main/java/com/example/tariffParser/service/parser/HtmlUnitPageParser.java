@@ -1,13 +1,19 @@
-package com.example.tariffParser.service;
+package com.example.tariffParser.service.parser;
 
 import com.example.tariffParser.model.Tariff;
-import lombok.extern.slf4j.Slf4j;
+import org.htmlunit.WebClient;
+import org.htmlunit.html.HtmlButton;
+import org.htmlunit.html.HtmlDivision;
+import org.htmlunit.html.HtmlPage;
+import org.htmlunit.html.HtmlSpan;
+import org.htmlunit.xpath.operations.Div;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.html.HTMLDivElement;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,37 +21,46 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Slf4j
-@Service
-public class JsoupPageParser implements PageParser {
+public class HtmlUnitPageParser implements PageParser {
     private final String url;
-
     private final Pattern patternForGb = Pattern.compile("(\\d+) ГБ");
     private final Pattern patternForMin = Pattern.compile("(\\d+) минут");
 
-
-    public JsoupPageParser(@Value("${parser.url:}") String url) {
+    public HtmlUnitPageParser(@Value("${parser.url:}") String url) {
         this.url = url;
     }
 
     @Override
     public List<Tariff> getTariffs() throws IOException {
-        try {
-            log.debug("Запрашивание тарифов с сайта");
-            Document document = Jsoup.connect(url).get();
-            Elements tariffsBlocks = document.select(".tariffs-carousel-v4__card-wrapper");
+        try (WebClient webClient = new WebClient()) {
+            webClient.getOptions().setThrowExceptionOnScriptError(false);
+            webClient.getOptions().setJavaScriptEnabled(true);
+            HtmlPage page = webClient.getPage(url);
             List<Tariff> tariffs = new ArrayList<>();
 
-            for (var tariffBlock : tariffsBlocks) {
-                tariffs.add(fetchTariffsFields(tariffBlock));
+            List<HtmlButton> categories = page.getByXPath("//button[@data-gtm-title=\"Другие тарифы\"]");
+            page = categories.getFirst().click();
+            webClient.waitForBackgroundJavaScript(10000);
+            tariffs.addAll(fetchCurrentTariffs(page));
+
+            for (var category : categories) {
+                tariffs.addAll(fetchCurrentTariffs(category.click()));
             }
 
             return tariffs;
-
-        } catch (IOException e) {
-            log.warn("Ошибка при парсинге тарифов");
-            throw new IOException("Не удалось получить тарифы");
         }
+    }
+
+    List<Tariff> fetchCurrentTariffs(HtmlPage page) {
+        Document document = Jsoup.parse(page.asXml());
+        Elements tariffsBlocks = document.select(".tariffs-carousel-v4__card-wrapper");
+        List<Tariff> tariffs = new ArrayList<>();
+
+        for (var tariffBlock : tariffsBlocks) {
+            tariffs.add(fetchTariffsFields(tariffBlock));
+        }
+
+        return tariffs;
     }
 
     private Tariff fetchTariffsFields(Element tariffBlock) {
